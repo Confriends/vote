@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Voting</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; }
+        .images { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .image-container { text-align: center; width: 48%; }
+        img { max-width: 100%; height: auto; border: 2px solid #ccc; border-radius: 8px; }
+        .vote-btn { margin-top: 10px; padding: 8px 16px; font-size: 16px; border-radius: 5px; border: none; background: #007bff; color: white; cursor: pointer; }
+        .vote-btn:disabled { background: #aaa; }
+        .results { margin-top: 30px; font-size: 20px; }
+        .bar { height: 24px; background: #007bff; border-radius: 12px; margin-top: 5px; color: #fff; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Vote for Your Favorite Image!</h1>
+    <div class="images">
+        <div class="image-container">
+            <img src="https://via.placeholder.com/250x150?text=Image+1" id="img1" alt="Image 1">
+            <button class="vote-btn" onclick="castVote(0)" id="btn1">Vote</button>
+        </div>
+        <div class="image-container">
+            <img src="https://via.placeholder.com/250x150?text=Image+2" id="img2" alt="Image 2">
+            <button class="vote-btn" onclick="castVote(1)" id="btn2">Vote</button>
+        </div>
+    </div>
+    <div class="results" id="results" style="display:none;">
+        <div>
+            <strong>Results:</strong>
+        </div>
+        <div>Image 1: <span id="votes1">0</span> votes</div>
+        <div class="bar" id="bar1" style="width: 0%;">0%</div>
+        <div>Image 2: <span id="votes2">0</span> votes</div>
+        <div class="bar" id="bar2" style="width: 0%;">0%</div>
+    </div>
+    <script>
+        // Simple "persistent" votes using localStorage for demo only
+        let votes = JSON.parse(localStorage.getItem('votes')) || [0, 0];
+        let voted = localStorage.getItem('voted') === '1';
+
+        function updateResults() {
+            const total = votes[0] + votes[1];
+            document.getElementById('votes1').textContent = votes[0];
+            document.getElementById('votes2').textContent = votes[1];
+            let percent1 = total ? Math.round((votes[0] / total) * 100) : 0;
+            let percent2 = total ? Math.round((votes[1] / total) * 100) : 0;
+            document.getElementById('bar1').style.width = percent1 + "%";
+            document.getElementById('bar1').textContent = percent1 + "%";
+            document.getElementById('bar2').style.width = percent2 + "%";
+            document.getElementById('bar2').textContent = percent2 + "%";
+        }
+
+        function showResults() {
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('btn1').disabled = true;
+            document.getElementById('btn2').disabled = true;
+            updateResults();
+        }
+
+        function castVote(idx) {
+            if (voted) return;
+            votes[idx]++;
+            localStorage.setItem('votes', JSON.stringify(votes));
+            localStorage.setItem('voted', '1');
+            voted = true;
+            showResults();
+        }
+
+        // If already voted, show results
+        if (voted) {
+            showResults();
+        }
+
+        // On page reload, update results if votes exist
+        if (votes[0] || votes[1]) {
+            updateResults();
+        }
+    </script>
+</body>
+</html>
